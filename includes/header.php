@@ -25,11 +25,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 <a href="/SLT_cafe/bookings/index.php">Bookings</a>
                 <a href="/SLT_cafe/menu.php">Cafe Menu</a>
                 <a href="/SLT_cafe/cart/index.php">Cart</a>
-
-                <?php if ($_SESSION['user_type_id'] == 1) { ?>
-                    <a href="/SLT_cafe/admin/dashboard.php">Admin</a>
-                <?php } ?>
-
                 <a href="/SLT_cafe/logout.php">Logout</a>
             <?php } else { ?>
                 <a href="/SLT_cafe/login.php">Login</a>
