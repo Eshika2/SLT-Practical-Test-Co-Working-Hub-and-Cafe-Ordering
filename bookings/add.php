@@ -11,19 +11,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get form data
     $space_name = trim($_POST["space_name"]);
     $booking_date = $_POST["booking_date"];
+    $booking_time = $_POST["booking_time"];
     $user_id = $_SESSION["user_id"];
 
     // Simple validation
-    if ($space_name == "" || $booking_date == "") {
+    if ($space_name == "" || $booking_date == "" || $booking_time == "") {
         $message = "All fields are required.";
     } else {
-        // Insert booking
-        $sql = "INSERT INTO bookings (user_id, space_name, booking_date) VALUES (?, ?, ?)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$user_id, $space_name, $booking_date]);
 
-        header("Location: index.php");
-        exit();
+        // Check whether same space is already booked at same date and time
+        $sql = "SELECT id FROM bookings 
+                WHERE space_name = ? 
+                AND booking_date = ? 
+                AND booking_time = ? 
+                AND is_active = 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$space_name, $booking_date, $booking_time]);
+        $existingBooking = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existingBooking) {
+            $message = "This space is already booked for this date and time.";
+        } else {
+            // Insert booking
+            $sql = "INSERT INTO bookings (user_id, space_name, booking_date, booking_time) 
+                    VALUES (?, ?, ?, ?)";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$user_id, $space_name, $booking_date, $booking_time]);
+
+            header("Location: index.php");
+            exit();
+        }
     }
 }
 
@@ -51,6 +70,9 @@ include "../includes/header.php";
 
         <label class="block mb-2">Booking Date</label>
         <input type="date" name="booking_date" class="w-full border p-2 mb-4" required>
+
+        <label class="block mb-2">Booking Time</label>
+        <input type="time" name="booking_time" class="w-full border p-2 mb-4" required>
 
         <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded">
             Save Booking

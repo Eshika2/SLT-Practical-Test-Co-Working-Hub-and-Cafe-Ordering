@@ -9,7 +9,7 @@ $sql = "SELECT bookings.*, users.name
         FROM bookings 
         JOIN users ON bookings.user_id = users.id
         WHERE bookings.is_active = 1
-        ORDER BY bookings.booking_date ASC";
+        ORDER BY bookings.booking_date ASC, bookings.booking_time ASC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
@@ -33,6 +33,7 @@ include "../includes/header.php";
                 <th class="border p-2">Member Name</th>
                 <th class="border p-2">Space Name</th>
                 <th class="border p-2">Booking Date</th>
+                <th class="border p-2">Booking Time</th>
                 <th class="border p-2">Created At</th>
                 <th class="border p-2">Action</th>
             </tr>
@@ -54,13 +55,16 @@ include "../includes/header.php";
                     </td>
 
                     <td class="border p-2">
+                        <?php echo date("h:i A", strtotime($booking["booking_time"])); ?>
+                    </td>
+
+                    <td class="border p-2">
                         <?php echo htmlspecialchars($booking["created_at"]); ?>
                     </td>
 
                     <td class="border p-2 text-center font-bold">
                         <?php if ($booking["user_id"] == $_SESSION["user_id"]) { ?>
-                            <a href="edit.php?id=<?php echo $booking["id"]; ?>" 
-                                class="text-blue-600">
+                            <a href="edit.php?id=<?php echo $booking["id"]; ?>" class="text-blue-600">
                                 Edit
                             </a>
 
@@ -72,6 +76,14 @@ include "../includes/header.php";
                         <?php } else { ?>
                             -
                         <?php } ?>
+                    </td>
+                </tr>
+            <?php } ?>
+
+            <?php if (count($bookings) == 0) { ?>
+                <tr>
+                    <td colspan="6" class="border p-4 text-center text-gray-600">
+                        No bookings found.
                     </td>
                 </tr>
             <?php } ?>

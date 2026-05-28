@@ -28,6 +28,7 @@ CREATE TABLE bookings (
     user_id INT NOT NULL,
     space_name VARCHAR(100) NOT NULL,
     booking_date DATE NOT NULL,
+    booking_time TIME NOT NULL,
     is_active INT NULL DEFAULT '1',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)

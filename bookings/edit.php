@@ -33,20 +33,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $space_name = trim($_POST["space_name"]);
     $booking_date = $_POST["booking_date"];
+    $booking_time = $_POST["booking_time"];
 
-    if ($space_name == "" || $booking_date == "") {
+    if ($space_name == "" || $booking_date == "" || $booking_time == "") {
         $message = "All fields are required.";
     } else {
-        // Update own booking only
-        $sql = "UPDATE bookings 
-                SET space_name = ?, booking_date = ? 
-                WHERE id = ? AND user_id = ?";
+
+        // Check duplicate booking, but ignore current booking id
+        $sql = "SELECT id FROM bookings 
+                WHERE space_name = ? 
+                AND booking_date = ? 
+                AND booking_time = ? 
+                AND is_active = 1
+                AND id != ?";
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$space_name, $booking_date, $id, $user_id]);
+        $stmt->execute([$space_name, $booking_date, $booking_time, $id]);
+        $existingBooking = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        header("Location: index.php");
-        exit();
+        if ($existingBooking) {
+            $message = "This space is already booked for this date and time.";
+        } else {
+            // Update own booking only
+            $sql = "UPDATE bookings 
+                    SET space_name = ?, booking_date = ?, booking_time = ?
+                    WHERE id = ? AND user_id = ?";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$space_name, $booking_date, $booking_time, $id, $user_id]);
+
+            header("Location: index.php");
+            exit();
+        }
     }
 }
 
@@ -72,12 +90,22 @@ include "../includes/header.php";
         </select>
 
         <label class="block mb-2">Booking Date</label>
+        <input 
+            type="date" 
+            name="booking_date" 
+            class="w-full border p-2 mb-4" 
+            value="<?php echo htmlspecialchars($booking["booking_date"]); ?>" 
+            required
+        >
 
-        <input type="date" 
-               name="booking_date" 
-               class="w-full border p-2 mb-4" 
-               value="<?php echo htmlspecialchars($booking["booking_date"]); ?>" 
-               required>
+        <label class="block mb-2">Booking Time</label>
+        <input 
+            type="time" 
+            name="booking_time" 
+            class="w-full border p-2 mb-4" 
+            value="<?php echo htmlspecialchars($booking["booking_time"]); ?>" 
+            required
+        >
 
         <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded">
             Update Booking
