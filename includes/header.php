@@ -25,7 +25,9 @@ if (session_status() === PHP_SESSION_NONE) {
                 <a href="/SLT_cafe/bookings/index.php">Bookings</a>
                 <a href="/SLT_cafe/menu.php">Cafe Menu</a>
                 <a href="/SLT_cafe/cart/index.php">Cart</a>
-                <a href="/SLT_cafe/logout.php">Logout</a>
+                <div class="w-[60px] h-[30px] bg-red-500 rounded-md relative inline-block text-center">
+                    <a href="/SLT_cafe/logout.php">Logout</a>
+                </div>
             <?php } else { ?>
                 <a href="/SLT_cafe/login.php">Login</a>
                 <a href="/SLT_cafe/register.php">Register</a>
